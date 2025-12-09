@@ -1,16 +1,18 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 8080; // Azure Web App sets PORT env var
 
-// Serve static files (including index.html)
-app.use(express.static(__dirname));
+const PORT = process.env.PORT || 3000;
 
-// Catch-all route to serve index.html
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

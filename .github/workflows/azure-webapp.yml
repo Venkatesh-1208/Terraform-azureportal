@@ -24,14 +24,16 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package.json
 
-    - name: npm install, build, and test
+    - name: npm install and build
       run: |
         cd frontend
-        npm install
-        # Add build / test scripts here if applicable
+        npm ci
+        npm run build --if-present
 
     - name: Zip artifact for deployment
-      run: zip -r release.zip frontend/*
+      run: |
+        cd frontend
+        zip -r ../release.zip dist server.js package.json node_modules
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
