@@ -1,0 +1,41 @@
+name: Build and Deploy Docker Container
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - docker-deployment # Optional: triggered on specific branch if needed, or maintain 'main' if replacing
+
+env:
+  # Registry settings (Replace with your own or use Secrets)
+  REGISTRY_NAME: 'docker.io' # or your-acr-name.azurecr.io
+  IMAGE_NAME: 'azure-portal-v2'
+  AZURE_WEBAPP_NAME: 'your-app-name-here'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_NAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.REGISTRY_NAME }}/${{ secrets.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Azure Web App for Containers
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: ${{ env.REGISTRY_NAME }}/${{ secrets.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

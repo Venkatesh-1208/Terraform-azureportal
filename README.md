@@ -33,3 +33,29 @@ This version **cannot** be opened directly in the browser due to security featur
 
 ### How to Run
 Simply double-click `frontend/index.backup.html` to open it in your browser.
+
+---
+
+## 3. Docker Support (Optional)
+If you prefer to run this as a container:
+1.  Build the image:
+    ```bash
+    cd frontend
+    docker build -t azure-portal-v2 .
+    ```
+2.  Run the container:
+    ```bash
+    docker run -p 3000:3000 azure-portal-v2
+    ```
+
+## 4. GitHub Actions Configuration
+To use the pipelines, set these **Repository Secrets** in GitHub:
+
+| Secret | Description |
+|--------|-------------|
+| `AZURE_WEBAPP_PUBLISH_PROFILE` | Download from Azure Portal (Web App -> Overview -> Get publish profile) |
+| `REGISTRY_USERNAME` | (Docker Only) Docker Hub or ACR Username |
+| `REGISTRY_PASSWORD` | (Docker Only) Docker Hub or ACR Password | 
+
+*   **Standard Deploy:** Pushes to `main` trigger `azure-webapp.yml` (Code Deploy).
+*   **Docker Deploy:** Manually trigger `azure-docker.yml` or configure branches as needed.
